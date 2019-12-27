@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css"></link>
+ </head>
+<body>
+  <div id="formDiv">
+    <form id="form1" class="my-form">
+      Serie: <select name="serie">
+             </select>
+      <br> <br>
+      Season: <select name="season">
+             </select>
+      Episode: <select name="episode">
+             </select>
+      <br> <br>
+      Autoplay: <input type="checkbox" id="autoplay">
+      <br><br>
+      <input type="button" onclick="playVideo()" value="Submit">
+    </form>
+  </div>
+
+  <div id="videoDiv">
+  </div>
+
+  <script type="text/javascript" src="js/video.js"></script>
+</body>
+</html>

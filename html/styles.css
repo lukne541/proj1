@@ -1,0 +1,16 @@
+#videoDiv {
+  margin: auto;
+  display: inline-block;
+  align-content: center;
+}
+
+body {
+  text-align: center;
+}
+
+#formDiv {
+  
+  margin: auto;
+  display: inline-block;
+  width: 100%
+}
