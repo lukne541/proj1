@@ -28,6 +28,11 @@ def main(dir, db_name):
     add_to_databse(db_name, episodes)
 
 def clean_database(db_name):
+    """
+
+    :param db_name:
+    :return:
+    """
     conn = sqlite3.connect(db_name)
     c = conn.cursor()
     tables = []
@@ -61,17 +66,19 @@ def add_to_databse(db_name, episodes):
 def find_all(dir, dict, root_dir):
     entries = os.listdir(dir)
 
-    r = re.compile(".*\.(mp4|m4v|vtt|flac|wav)")
+    r = re.compile(".*\.(mp4|mkv|m4v|vtt|flac|wav)")
     filtered_entries = list(filter(r.match, entries))
     if len(filtered_entries) == 0:
         for entry in entries:
             if os.path.isdir(os.path.join(dir, entry)):
                 find_all(dir+"/"+entry, dict, root_dir)
     else:
-        #print(dir)
+        
         for entry in filtered_entries:
             fn = entry.split("/")[-1]
 
+            if "BBC" in entry:
+                print(end="")
 
             if entry.endswith(".wav") or entry.endswith(".flac"):
                 try:
@@ -113,7 +120,7 @@ def find_all(dir, dict, root_dir):
             args = d.split("/")[1:]
             sub_dir = ""
             media_dir = ""
-            if entry.endswith(".m4v") or entry.endswith(".mp4"):
+            if entry.endswith(".m4v") or entry.endswith(".mp4") or entry.endswith(".mkv"):
                 media_dir = dir + "/" + entry
                 
                 reg = r'.*(S|s)' + str(season) + r'.*(E|e)' + str(episode) + r'.*(.vtt)$'
@@ -139,4 +146,7 @@ def find_all(dir, dict, root_dir):
 
                 
 if __name__=='__main__':
-    main(sys.argv[1], sys.argv[2])
+    try:
+        main(sys.argv[1], sys.argv[2])
+    except IndexError:
+        main(r"/home/lukas/Videos/Series", "media.db")
