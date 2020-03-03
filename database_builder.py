@@ -47,18 +47,23 @@ def add_to_databse(db_name, episodes):
     #print(series)
 
     for serie in series:
-       # print("SERIE: " + serie)
         c.execute(r"CREATE TABLE " + serie + r" (season INTEGER, episode INTEGER, media_dir TEXT, sub_dir TEXT);")
 
     for ep in episodes:
         if ep.sub_dir == "": ep.sub_dir = " "
         t = (ep.season, ep.episode, ep.media_dir, ep.sub_dir)
         if ep.serie_name == "Generation_war": print(t)
+        #print(ep.serie_name)
         c.execute("INSERT INTO " + ep.serie_name + " VALUES (?, ?, ?, ?)", t)
     conn.commit()
     conn.close()
 
-def find_all(dir, dict, root_dir):
+def find_all(dir, media_dict, root_dir):
+    """
+    dir - where the functions is looking for media files.
+    media_dict - where it saves 
+
+    """
     entries = os.listdir(dir)
 
     r = re.compile(".*\.(mp4|m4v|vtt|flac|wav)")
@@ -66,7 +71,7 @@ def find_all(dir, dict, root_dir):
     if len(filtered_entries) == 0:
         for entry in entries:
             if os.path.isdir(os.path.join(dir, entry)):
-                find_all(dir+"/"+entry, dict, root_dir)
+                find_all(dir+"/"+entry, media_dict, root_dir)
     else:
         #print(dir)
         for entry in filtered_entries:
@@ -97,18 +102,25 @@ def find_all(dir, dict, root_dir):
                 episode = episode.group(0)
 
             
-
             try:
-                if re.search(r"[0-9]", episode) is not None and re.search(r"[0-9]", season) is not None:
-                    season = re.sub("[^0-9]", "", season)
+                if re.search(r"[0-9]", episode) is not None:
                     episode = re.sub("[^0-9]", "", episode)
                 else:
-                    print("epi, seas", episode, season)
+                    print("EPISODE IS NONE")
+            except TypeError as e:
+                print(episode, e)
+                episode = 1
 
-            except TypeError:
-                print("EXCEPT epi, seas", episode, season)
-                pass
-                
+            try:
+                if re.search(r"[0-9]", season) is not None:
+                    season = re.sub("[^0-9]", "", season)
+                else:
+                    print("SEASON IS NONE")
+            except TypeError as e:
+                print(season, e)
+                season = 1
+
+
             d = dir[len(root_dir):]
             args = d.split("/")[1:]
             sub_dir = ""
@@ -128,14 +140,20 @@ def find_all(dir, dict, root_dir):
                 args[0] = args[0].replace("__", "_")
                 #print(args[0], " <--")
 
-                dict.append(Episode(args[0], season, episode, media_dir, sub_dir))
+                # Get rid of special characters and digits from the serie name.
+                serie_name = re.sub('\W+|\d+', "", args[0])
+
+                media_dict.append(Episode(serie_name, season, episode, media_dir, sub_dir))
             elif entry.endswith(".wav") or entry.endswith(".flac"):
                 media_dir = dir + "/" + entry
                 args[0] = args[0].replace("-", "_")
                 args[0] = args[0].replace(" ", "_")
                 args[0] = args[0].replace("__", "_")
                 print(args[0])
-                dict.append(Episode(args[0], str(season), str(episode), media_dir, ""))
+                # Get rid of special characters and digits from the serie name.
+                serie_name = re.sub('\W+|\d+', "", args[0])
+
+                media_dict.append(Episode(serie_name, str(season), str(episode), media_dir, ""))
 
                 
 if __name__=='__main__':
